@@ -27,6 +27,12 @@ impl ParsePosNonzeroError {
     // TODO: add another error conversion function here.
     // fn from_parseint...
 }
+impl From<CreationError> for ParsePosNonzeroError {
+    fn from(err: CreationError) -> Self {
+        ParsePosNonzeroError::Creation(err)
+    }
+}
+
 
 fn parse_pos_nonzero(s: &str) -> Result<PositiveNonzeroInteger, ParsePosNonzeroError> {
     // TODO: change this to return an appropriate error instead of panicking
