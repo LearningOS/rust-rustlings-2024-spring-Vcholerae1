@@ -35,7 +35,10 @@ impl<T> Default for LinkedList<T> {
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T> LinkedList<T> 
+where 
+T :Ord + Copy
+{
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -69,15 +72,35 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+	pub fn merge(mut list_a: LinkedList<T>, mut list_b: LinkedList<T>) -> Self {
+        let mut merged_list = LinkedList::<T>::new();
+        let mut current_a = list_a.start;
+        let mut current_b = list_b.start;
+        
+        // Using unsafe blocks to manage raw pointers
+        while let (Some(node_a), Some(node_b)) = (current_a, current_b) {
+            unsafe {
+                if (*node_a.as_ptr()).val <= (*node_b.as_ptr()).val {
+                    merged_list.add((*node_a.as_ptr()).val);
+                    current_a = (*node_a.as_ptr()).next;
+                } else {
+                    merged_list.add((*node_b.as_ptr()).val);
+                    current_b = (*node_b.as_ptr()).next;
+                }
+            }
         }
-	}
+
+        // If one list is not empty, add remaining elements
+        let mut remaining = if current_a.is_some() { current_a } else { current_b };
+        while let Some(node) = remaining {
+            unsafe {
+                merged_list.add((*node.as_ptr()).val);
+                remaining = (*node.as_ptr()).next;
+            }
+        }
+
+        merged_list
+    }
 }
 
 impl<T> Display for LinkedList<T>
